@@ -329,7 +329,10 @@ contract BotsAttack {
         playerWins[_player]++;
 
         // Create new score
-        Score memory newScore = Score({player: _player, totalWins: playerWins[_player]});
+        Score memory newScore = Score({
+            player: _player,
+            totalWins: playerWins[_player]
+        });
 
         // Update top scores
         _updateTopScores(newScore);
@@ -350,6 +353,23 @@ contract BotsAttack {
     }
 
     function _updateTopScores(Score memory newScore) internal {
+        // First, remove any existing entry for this player
+        uint256 existingIndex = topScores.length; // Use length as "not found" marker
+        for (uint256 i = 0; i < topScores.length; i++) {
+            if (topScores[i].player == newScore.player) {
+                existingIndex = i;
+                break;
+            }
+        }
+
+        // Remove existing entry if found
+        if (existingIndex < topScores.length) {
+            for (uint256 i = existingIndex; i < topScores.length - 1; i++) {
+                topScores[i] = topScores[i + 1];
+            }
+            topScores.pop();
+        }
+
         // Find where the new score should be inserted
         uint256 insertIndex = topScores.length;
         for (uint256 i = 0; i < topScores.length; i++) {
