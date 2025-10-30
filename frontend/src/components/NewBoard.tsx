@@ -181,7 +181,6 @@ const BotBoard = ({
                   )}
                 </div>
               )}
-              <div></div>
             </div>
           )}
       </div>

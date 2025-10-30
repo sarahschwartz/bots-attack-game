@@ -9,6 +9,11 @@ contract BotsAttack {
     uint8 constant INFECTED = 2;
     uint8 constant MISS = 3;
 
+    struct Score {
+        address player;
+        uint256 totalWins;
+    }
+
     struct Game {
         address player1;
         address player2;
@@ -40,6 +45,13 @@ contract BotsAttack {
     uint256 private gameCounter;
     // Mapping of player addresses to game IDs
     mapping(address => uint256[]) private playerGames;
+
+    // Array to store top scores
+    Score[] public topScores;
+    uint256 private constant MAX_TOP_SCORES = 10;
+
+    // Mapping of player address to their personal best score
+    mapping(address => uint256) public playerWins;
 
     // Events
     event GameCreated(uint256 gameId, address player1);
@@ -201,14 +213,16 @@ contract BotsAttack {
                 if (game.player2BotsRemaining == 0) {
                     game.gameOver = true;
                     game.winner = game.player1;
-                    emit GameOver(gameId, game.player1);
+                    _submitScore(game.winner);
+                    emit GameOver(gameId, game.winner);
                 }
             } else {
                 game.player1BotsRemaining--;
                 if (game.player1BotsRemaining == 0) {
                     game.gameOver = true;
                     game.winner = game.player2;
-                    emit GameOver(gameId, game.player2);
+                    _submitScore(game.winner);
+                    emit GameOver(gameId, game.winner);
                 }
             }
         }
@@ -289,10 +303,11 @@ contract BotsAttack {
 
     // cancels a game where the last move was more than 20 minutes ago
     // last player to make a move forfeits
-    function cancelInactiveGame(uint256 gameId) validGame(gameId) external {
+    function cancelInactiveGame(uint256 gameId) external validGame(gameId) {
         Game storage game = games[gameId];
         require(game.player2 != address(0), "no player 2");
         require(game.gameOver == false, "game is already over");
+        require(game.player1Ready || game.player2Ready, "neither board is set");
         // check if more than 20 minutes has passed
         require(
             block.timestamp >= game.lastMoveTime + 20 minutes,
@@ -307,5 +322,65 @@ contract BotsAttack {
             game.winner = game.player1;
             emit GameOver(gameId, game.player1);
         }
+        _submitScore(game.winner);
+    }
+
+    function _submitScore(address _player) internal {
+        playerWins[_player]++;
+
+        // Create new score
+        Score memory newScore = Score({player: _player, totalWins: playerWins[_player]});
+
+        // Update top scores
+        _updateTopScores(newScore);
+    }
+
+    // returns true if score1 is higher than score2
+    function _isScoreHigher(
+        Score memory score1,
+        Score memory score2
+    ) internal pure returns (bool) {
+        if (score1.totalWins == 0) return false; // Handle empty scores
+        if (score2.totalWins == 0) return true; // Handle empty scores
+
+        if (score1.totalWins > score2.totalWins) {
+            return true;
+        }
+        return false;
+    }
+
+    function _updateTopScores(Score memory newScore) internal {
+        // Find where the new score should be inserted
+        uint256 insertIndex = topScores.length;
+        for (uint256 i = 0; i < topScores.length; i++) {
+            if (!_isScoreHigher(topScores[i], newScore)) {
+                insertIndex = i;
+                break;
+            }
+        }
+
+        // If the score qualifies for top scores
+        if (insertIndex < MAX_TOP_SCORES) {
+            // If not at capacity, extend the array
+            if (topScores.length < MAX_TOP_SCORES) {
+                topScores.push(newScore);
+            }
+
+            // Shift existing scores down
+            for (uint256 i = topScores.length - 1; i > insertIndex; i--) {
+                topScores[i] = topScores[i - 1];
+            }
+
+            // Insert the new score
+            topScores[insertIndex] = newScore;
+        }
+    }
+
+    function getTopScores() external view returns (Score[] memory) {
+        return topScores;
+    }
+
+    function getPlayerWins(address _player) external view returns (uint256) {
+        return playerWins[_player];
     }
 }

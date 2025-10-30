@@ -43,7 +43,7 @@ export function Game({ address }: { address: `0x${string}` }) {
     abi: CONTRACT_ABI,
     address: CONTRACT_ADDRESS,
     functionName: "getPlayerBoards",
-    args: playerGames as bigint[],
+    args: [gameID],
     account: address,
     query: { refetchInterval: 1000 * 10}
   });
@@ -61,7 +61,7 @@ export function Game({ address }: { address: `0x${string}` }) {
   const CANCEL_TIME = 1000 * 60 * 20;
   const timestamp = Array.isArray(gameData) ? gameData[8] : 0;
   const lastBlockMs = Number(timestamp) * 1000;
-  const isGameActive = gameStatus !== 'waiting-for-match' && gameStatus !== 'win' && gameStatus !== 'loss';
+  const isGameActive = gameStatus && gameStatus !== 'waiting-for-match' && gameStatus !== 'win' && gameStatus !== 'loss' && gameStatus !== 'board-not-set';
   const gameIsInactive = 
     isGameActive && timestamp > 0 ? Date.now() - lastBlockMs > CANCEL_TIME : false;
 
@@ -112,7 +112,7 @@ export function Game({ address }: { address: `0x${string}` }) {
     </div>
     )
 }
-
+  
   return (
     <div>
         

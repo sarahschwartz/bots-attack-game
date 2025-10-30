@@ -1,6 +1,6 @@
 import * as CONTRACT_ABI_JSON from "../../../contracts/artifacts/contracts/BotsAttack.sol/BotsAttack.json"
 
-export const CONTRACT_ADDRESS = "0xe441CF0795aF14DdB9f7984Da85CD36DB1B8790d";
+export const CONTRACT_ADDRESS = "0xf1Ebfaa992854ECcB01Ac1F60e5b5279095cca7F";
 
 export const CONTRACT_ABI = CONTRACT_ABI_JSON.abi;
 

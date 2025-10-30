@@ -27,3 +27,9 @@ cd frontend
 bun install
 bun dev
 ```
+
+Send local ETH to your wallet with:
+
+```bash
+zkstack dev rich-account 0x<YOUR_ADDRESS> --chain <YOUR_CHAIN_NAME>
+```
