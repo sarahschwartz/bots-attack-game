@@ -40,22 +40,29 @@ export function LeaderboardTable({ address }: { address: `0x${string}` }) {
               <thead>
                 <tr className="text-white/80">
                   <th className="px-5 py-3 text-left font-semibold">
+                    <div>Rank</div>
+                    <div className="mt-2 h-0.5 w-10 rounded-full bg-gradient-to-r from-emerald-500 to-teal-500" />
+                  </th>
+                  <th className="px-5 py-3 text-left font-semibold">
                     <div>Player Address</div>
-                    <div className="mt-2 h-0.5 w-12 rounded-full bg-gradient-to-r from-emerald-500 to-teal-500" />
+                    <div className="mt-2 h-0.5 w-28 rounded-full bg-gradient-to-r from-emerald-500 to-teal-500" />
                   </th>
                   <th className="px-5 py-3 text-right font-semibold">
                     <div># of Wins</div>
-                    <div className="mt-2 ml-auto h-0.5 w-12 rounded-full bg-gradient-to-r from-emerald-500 to-teal-500" />
+                    <div className="mt-2 ml-auto h-0.5 w-16 rounded-full bg-gradient-to-r from-emerald-500 to-teal-500" />
                   </th>
                 </tr>
               </thead>
 
               <tbody className="[&>tr:last-child>td]:border-b-0">
-                {allScores.map(({ player, totalWins }) => (
+                {allScores.map(({ player, totalWins }, index) => (
                   <tr
                     key={player}
                     className="border-b border-white/10 transition-colors hover:bg-white/10"
                   >
+                    <td className="px-5 py-3">
+                      <span className="font-medium text-white">#{index + 1}</span>
+                    </td>
                     <td className="px-5 py-3">
                       <span className="font-medium text-white">{player}</span>
                     </td>
