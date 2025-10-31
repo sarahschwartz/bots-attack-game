@@ -40,7 +40,7 @@ const BotBoard = ({
 
   const { writeContract, data: hash, isPending } = useWriteContract();
 
-  const { isSuccess } = useWaitForTransactionReceipt({ hash});
+  const {  isPending: isFinalizing, isSuccess } = useWaitForTransactionReceipt({ hash });
 
   async function handleSubmitBoard(e: React.MouseEvent) {
     e.preventDefault();
@@ -168,10 +168,12 @@ const BotBoard = ({
               </div>
               {remainingBots === 0 && (
                 <div>
-                  {isPending && (
-                    <Spinner/>
+                  {(isPending || (isFinalizing && hash)) && (
+                    <div className="flex justify-center mb-4">
+                      <Spinner/>
+                    </div>
                   )} 
-                  {!isSuccess && !isPending && (
+                  {!isSuccess && !isPending && !hash && (
                   <button
                     className="button"
                     onClick={(e) => handleSubmitBoard(e)}
